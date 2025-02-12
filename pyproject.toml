@@ -1,17 +1,36 @@
-#  Edit the following fields to match your project
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
-name = "comfyui-customnodes-template"
-description = "Template repository for custom nodes from [ComfyUI-CustomNodes-Template](https://github.com/jhj0517/ComfyUI-CustomNodes-Template)."
-version = "1.0.0"
-license = {file = "LICENSE"}
-dependencies = ["",]  # e.g.) ["numpy==1.18.1", ]
-
-[project.urls]
-Repository = "https://github.com/jhj0517/ComfyUI-CustomNodes-Template"
-#  Used by Comfy Registry https://comfyregistry.org
+name = "comfyui-io-helpers"
+version = "0.1.0"
+description = "A custom nodes package for ComfyUI that enhances workflow flexibility by providing specialized nodes for saving and loading intermediate data (encoded prompts and sampled latents) in multiple formats. This package leverages helper classes for file I/O, supports gzip compression for efficient storage, and integrates progress feedback via a progress bar to improve user experience during long operations."
+readme = "README.md"
+authors = [
+    { name = "Austin Brown", email = "austinbrown34@gmail.com" }
+]
+license = { file = "LICENSE" }
+keywords = [
+    "comfyui",
+    "custom-nodes",
+    "prompt encoding",
+    "latent sampling",
+    "progress bar",
+    "file I/O",
+    "gzip"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+dependencies = [
+    "torch>=1.7",
+    "numpy>=1.19"
+]
 
 [tool.comfy]
-PublisherId = "jhj0517"
-DisplayName = "ComfyUI-CustomNodes-Template"
+PublisherId = "austinbrown34"
+DisplayName = "ComfyUI-IO-Helpers"
 Icon = ""

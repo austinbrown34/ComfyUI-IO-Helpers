@@ -1,89 +1,115 @@
-# ComfyUI CustomNode Template
+# ComfyUI IO Helpers
 
-This is the [ComfyUI](https://github.com/comfyanonymous/ComfyUI) custom node template repository that anyone can use to create their own custom nodes.
+A custom nodes package for ComfyUI that enhances workflow flexibility by providing specialized nodes for saving and loading intermediate data. This package makes it easy to store and retrieve encoded prompts and sampled latents in multiple formats, with support for compression to optimize storage space.
 
-## Directory Structure
-```
-Project-Name/
-├── .github/                # GA workflow for publishing the ComfyUI registry 
-├── workflows/              # Example workflows for your custom node
-├── modules/                # Your own modules for the custom node
-├── .gitignore              # gitignore file 
-├── __init__.py             # Map your custom node display names here 
-├── nodes.py                # Your custom node classes  
-├── README.md               # README file
-├── pyproject.toml          # Metadata file for the ComfyUI registry
-└── requirements.txt        # Project dependencies 
-```
+![banner](assets/banner.png)
 
-## Custom Node Files
+## Features
 
-### [nodes.py](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/tree/master/nodes.py)
-This file is where your actual custom node classes are defined. The class has specific methods that are called by the ComfyUI engine.
-There're some basic custom nodes for the example with some comments, you can modify them as you need.
-For detailed information on how to create custom nodes, please refer to the ComfyUI official documentation: 
-- https://docs.comfy.org/essentials/custom_node_walkthrough.
+-   Save and load encoded prompts and sampled latents in multiple formats (pt, pth, npy)
+-   Gzip compression support for efficient storage
+-   Progress bar integration for better user feedback during operations
+-   Clean, modular design with helper classes for file I/O
+-   Seamless integration with ComfyUI workflows
 
-### [__init__.py](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/tree/master/__init__.py)
-You can map your custom node display names here. It will be used when users search for your custom node in the ComfyUI.
-
-### [pyproject.toml](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/tree/master/pyproject.toml)
-This file is used to publish your custom node to the ComfyUI registry. If you want to publish your custom node to the ComfyUI registry, you need to modify this file.
-
-If you wonder what ComfyUI registry is, please read:
-
-- https://docs.comfy.org/registry/overview#why-use-the-registry
-
-### [requirements.txt](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/tree/master/requirements.txt)
-This file contains the dependencies needed for your custom node. `torch` is already installed in the ComfyUI, so you only need to add "extra" dependencies here.
-
-### [workflows/example-1.json](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/tree/master/workflows)
-This is optional, but it is recommended to put your ComfyUI workflow json file inside your project so users can easily understand how to use your custom node.
-
-## Github Actions
-
-### [publish-comfyui-registry.yml](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/tree/master/.github/workflows/publish-comfyui-registry.yml)
-When you push into the `master` branch, this workflow will be triggered and publish your custom node to the ComfyUI registry, using your [pyproject.toml](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/tree/master/pyproject.toml).
-You have to register your "REGISTRY_ACCESS_TOKEN" in the Github Action Secrets which you can get from:
-- https://docs.comfy.org/registry/publishing#create-an-api-key-for-publishing
-
-After generating the repository from this template, uncomment the push to enable the workflow with auto trigger:
-
-https://github.com/jhj0517/ComfyUI-CustomNodes-Template/blob/6ae10a1d161933c5e3cff432e1c8bbc9396be954/.github/workflows/publish-comfyui-registry.yml#L4-L10
-
-## Github Issue & PR templates
-
-There are some basic templates for the Github issues & PR. You can edit them or add more to fit your project's needs.
-
-- Issue Templates:
-  1. [bug_report.md](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/blob/master/.github/ISSUE_TEMPLATE/bug_report.md) : Basic bug report template
-  2. [feature_request.md](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/blob/master/.github/ISSUE_TEMPLATE/feature_request.md) : Feature request template
-
-- PR Template: [pull_request_template.md](https://github.com/jhj0517/ComfyUI-CustomNodes-Template/blob/master/.github/pull_request_template.md)
-
-
-## How to Strat Using Template
-
-Click "Use this template" -> "Create a new repository", then you can create your own custom node from there.
-
-![image](https://github.com/user-attachments/assets/fab4da53-0458-4e88-adc1-5bb5d341a511)
-
-The custom node installation guide below can usually be used for any custom node, you can use it in your README by modifying the repository name and URL.
 ## Installation
 
-1. git clone repository into `ComfyUI\custom_nodes\`
-```
-git clone https://github.com/replace-this-with-your-github-repository-url.git
+### Using ComfyUI Manager (Recommended)
+
+1. Install [ComfyUI Manager](https://github.com/ltdrdata/ComfyUI-Manager)
+2. Find and install 'ComfyUI-IO-Helpers' through the manager interface
+3. Restart ComfyUI
+
+### Manual Installation
+
+Clone this repository into your ComfyUI custom_nodes directory:
+
+```bash
+cd custom_nodes
+git clone https://github.com/austinbrown34/comfyui-io-helpers.git
 ```
 
-2. Go to `ComfyUI\custom_nodes\ComfyUI-Your-CustomNode-Name` and run
-```
-pip install -r requirements.txt
+## Available Nodes
+
+### Encoded Prompt Nodes
+
+1. **EncodedPromptToFile**
+
+    - Save encoded prompts to file with optional compression
+    - Supports multiple output formats (pt, pth, npy)
+    - Includes progress tracking
+
+2. **EncodedPromptFromFile**
+    - Load encoded prompts from saved files
+    - Automatic handling of compressed and uncompressed files
+    - Progress tracking during load operations
+
+### Sampled Latents Nodes
+
+1. **SampledLatentsToFile**
+
+    - Save sampled latents to file with optional compression
+    - Multiple format support
+    - Built-in progress tracking
+
+2. **SampledLatentsFromFile**
+    - Load sampled latents from saved files
+    - Handles both compressed and uncompressed formats
+    - Progress feedback during loading
+
+## Usage Examples
+
+### Saving Encoded Prompts
+
+```python
+# Example workflow using EncodedPromptToFile
+encoded_prompt_node = EncodedPromptToFile(
+    conditioning=your_conditioning,
+    filename_prefix="my_prompt",
+    output_format="pt",
+    compress=True
+)
 ```
 
-If you are using the portable version of ComfyUI, do this:
-```
-python_embeded\python.exe -m pip install -r ComfyUI\custom_nodes\ComfyUI-Your-CustomNode-Name\requirements.txt
+### Loading Sampled Latents
+
+```python
+# Example workflow using SampledLatentsFromFile
+latents_node = SampledLatentsFromFile(
+    filepath="path/to/your/latents.pt.gz"
+)
 ```
 
+## Technical Details
 
+### Supported File Formats
+
+-   PyTorch formats (.pt, .pth)
+-   NumPy format (.npy)
+-   All formats support gzip compression (.gz)
+
+### Dependencies
+
+-   Python 3.x
+-   PyTorch >= 1.7
+-   NumPy >= 1.19
+-   ComfyUI (latest version recommended)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Credits
+
+-   [ComfyUI](https://github.com/comfyanonymous/ComfyUI) - The powerful and modular stable diffusion GUI that makes this project possible
+-   Inspired by the needs of the ComfyUI community for better intermediate data handling
+
+## Contact
+
+Austin Brown - austinbrown34@gmail.com
+
+For bugs and feature requests, please open an issue on the GitHub repository.

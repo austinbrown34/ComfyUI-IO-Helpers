@@ -1,152 +1,146 @@
-#  Package Modules
-import os
-from typing import Union, BinaryIO, Dict, List, Tuple, Optional
-import time
+"""
+nodes.py
 
-#  ComfyUI Modules
-import folder_paths
+This module defines custom nodes for ComfyUI to save and load intermediate
+data for the prompt encoding and sampling stages. It uses the Inputter and Outputter
+helper classes (from modules/io_helpers.py) and updates progress via a ProgressBar.
+"""
+
 from comfy.utils import ProgressBar
-
-#  Your Modules
-from .modules.calculator import CalculatorModel
+from .modules.io_helpers import Inputter, Outputter
 
 
-#  Basic practice to get paths from ComfyUI
-custom_nodes_script_dir = os.path.dirname(os.path.abspath(__file__))
-custom_nodes_model_dir = os.path.join(folder_paths.models_dir, "my-custom-nodes")
-custom_nodes_output_dir = os.path.join(folder_paths.get_output_directory(), "my-custom-nodes")
+class EncodedPromptToFile:
+    def __init__(self, conditioning, filename_prefix, output_format="pt", compress=True):
+        self.conditioning = conditioning
+        self.filename_prefix = filename_prefix
+        self.output_format = output_format
+        self.compress = compress
 
-
-#  These are example nodes that only contains basic functionalities with some comments.
-#  If you need detailed explanation, please refer to : https://docs.comfy.org/essentials/custom_node_walkthrough
-#  First Node:
-class MyModelLoader:
-    #  Define the input parameters of the node here.
     @classmethod
     def INPUT_TYPES(s):
-        my_models = ["Model A", "Model B", "Model C"]
-
         return {
-            #  If the key is "required", the value must be filled.
             "required": {
-                #  `my_models` is the list, so it will be shown as a dropdown menu in the node. ( So that user can select one of them. )
-                #  You must provide the value in the tuple format. e.g. ("value",) or (3,) or ([1, 2],) etc.
-                "model": (my_models,),
-                "device": (['cuda', 'cpu', 'auto'],),
-            },
-            #  If the key is "optional", the value is optional.
-            "optional": {
-                "compute_type": (['float32', 'float16'],),
+                "conditioning": ("CONDITIONING", ),
+                "filename_prefix": ("STRING", ),
+                # output_format can be pt, pth, or npy
+                "output_format": ([("STRING", {"options": ["pt", "pth", "npy"], "default": "pt"})]),
+                "compress": ("BOOLEAN", {"default": True}),
             }
         }
-
-    #  Define these constants inside the node.
-    #  `RETURN_TYPES` is important, as it limits the parameter types that can be passed to the next node, in `INPUT_TYPES()` above.
-    RETURN_TYPES = ("MY_MODEL",)
-    RETURN_NAMES = ("my_model",)
-    #  `FUNCTION` is the function name that will be called in the node.
-    FUNCTION = "load_model"
-    #  `CATEGORY` is the category name that will be used when user searches the node.
-    CATEGORY = "CustomNodesTemplate"
-
-    #  In the function, use same parameter names as you specified in `INPUT_TYPES()`
-    def load_model(self,
-                   model: str,
-                   device: str,
-                   compute_type: Optional[str] = None,
-                   ) -> Tuple[CalculatorModel]:
-        calculator_model = CalculatorModel()
-        calculator_model.load_model(model, device, compute_type)
-
-        #  You can use `comfy.utils.ProgressBar` to show the progress of the process.
-        #  First, initialize the total amount of the process.
-        total_steps = 5
-        comfy_pbar = ProgressBar(total_steps)
-        #  Then, update the progress.
-        for i in range(1, total_steps):
-            time.sleep(1)
-            comfy_pbar.update(i)  #  Alternatively, you can use `comfy_pbar.update_absolute(value)` to update the progress with absolute value.
-
-        #  Return the model as a tuple.
-        return (calculator_model, )
-
-
-#  Second Node
-class CalculatePlus:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "model": ("MY_MODEL", ),
-            },
-            #  Specify the parameters with type and default value.
-            "optional": {
-                "a": ("INT", {"default": 5}),
-                "b": ("INT", {"default": 10}),
-            }
-        }
-
-    RETURN_TYPES = ("INT",)
-    RETURN_NAMES = ("plus_value",)
-    FUNCTION = "plus"
-    CATEGORY = "CustomNodesTemplate"
-
-    def plus(self,
-             model: CalculatorModel,
-             a: Optional[int],
-             b: Optional[int],
-             ) -> Tuple[int]:
-        result = model.plus(a, b)
-        return (result, )
-
-
-
-#  Third Node
-class CalculateMinus:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "model": ("MY_MODEL", ),
-                "a": ("INT", ),
-            },
-            "optional": {
-                "b": ("INT", {"default": 10}),
-            }
-        }
-
-    RETURN_TYPES = ("INT",)
-    RETURN_NAMES = ("minus_value",)
-    FUNCTION = "minus"
-    CATEGORY = "CustomNodesTemplate"
-
-    def minus(self,
-             model: CalculatorModel,
-             a: Optional[int],
-             b: Optional[int],
-             ) -> Tuple[int]:
-        result = model.minus(a, b)
-        return (result, )
-
-
-
-#  Output Node
-class ExampleOutputNode:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "value": ("INT", ),
-            },
-        }
-
-    #  If the node is output node, set this to True.
+    RETURN_TYPES = ()
+    FUNCTION = "output_encoded_prompt_to_file"
     OUTPUT_NODE = True
-    RETURN_TYPES = ("INT",)
-    RETURN_NAMES = ("int",)
-    FUNCTION = "result"
-    CATEGORY = "CustomNodesTemplate"
+    CATEGORY = "encoded/outputter"
+    DESCRIPTION = "Save the encoded prompt to a file. If `compress` is True, the file will be compressed with gzip."
 
-    def result(self,
-               value: int,) -> Tuple[int]:
-        return (value, )
+    def output_encoded_prompt_to_file(self, conditioning, filename_prefix, output_format="pt", compress=True):
+        pb = ProgressBar()
+        pb.update(0)
+        
+        # Save the data using Outputter
+        file_path = Outputter.save_data(conditioning, filename_prefix, output_format)
+        pb.update(50)
+        
+        if compress:
+            file_path = Outputter.compress_file(file_path)
+            pb.update(100)
+            return file_path
+        else:
+            pb.update(100)
+            return file_path
+
+
+class EncodedPromptFromFile:
+    def __init__(self, filepath):
+        self.filepath = filepath
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "filepath": ("STRING", ),
+            }
+        }
+    
+    RETURN_TYPES = ("CONDITIONING", )
+    OUTPUT_TOOLTIPS = ("The conditioning tensor loaded from the file.", )
+    FUNCTION = "load_encoded_prompt_from_file"
+    CATEGORY = "encoded/inputter"
+    DESCRIPTION = "Load the encoded prompt from a file."
+
+    def load_encoded_prompt_from_file(self, filepath):
+        pb = ProgressBar()
+        pb.update(0)
+        
+        data = Inputter.load_data(filepath)
+        pb.update(100)
+        return data
+
+
+class SampledLatentsToFile:
+    def __init__(self, latents, filename_prefix, output_format="pt", compress=True):
+        self.latents = latents
+        self.filename_prefix = filename_prefix
+        self.output_format = output_format
+        self.compress = compress
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "latents": ("LATENT", ),
+                "filename_prefix": ("STRING", ),
+                # output_format can be pt, pth, or npy
+                "output_format": ([("STRING", {"options": ["pt", "pth", "npy"], "default": "pt"})]),
+                "compress": ("BOOLEAN", {"default": True}),
+            }
+        }
+    
+    RETURN_TYPES = ()
+    FUNCTION = "output_sampled_latents_to_file"
+    OUTPUT_NODE = True
+    CATEGORY = "latent/outputter"
+    DESCRIPTION = "Save the sampled latents to a file. If `compress` is True, the file will be compressed with gzip."
+
+    def output_sampled_latents_to_file(self, latents, filename_prefix, output_format="pt", compress=True):
+        pb = ProgressBar()
+        pb.update(0)
+        
+        file_path = Outputter.save_data(latents, filename_prefix, output_format)
+        pb.update(50)
+        
+        if compress:
+            file_path = Outputter.compress_file(file_path)
+            pb.update(100)
+            return file_path
+        else:
+            pb.update(100)
+            return file_path
+
+
+class SampledLatentsFromFile:
+    def __init__(self, filepath):
+        self.filepath = filepath
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "filepath": ("STRING", ),
+            }
+        }
+    
+    RETURN_TYPES = ("LATENT", )
+    OUTPUT_TOOLTIPS = ("The latents tensor loaded from the file.", )
+    FUNCTION = "load_sampled_latents_from_file"
+    CATEGORY = "latent/inputter"
+    DESCRIPTION = "Load the sampled latents from a file."
+
+    def load_sampled_latents_from_file(self, filepath):
+        pb = ProgressBar()
+        pb.update(0)
+        
+        data = Inputter.load_data(filepath)
+        pb.update(100)
+        return data
