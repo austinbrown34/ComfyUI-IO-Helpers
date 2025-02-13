@@ -8,7 +8,7 @@ helper classes (from modules/io_helpers.py) and updates progress via a ProgressB
 
 from comfy.utils import ProgressBar
 from comfy.cli_args import args
-from comfy import folder_paths
+import folder_paths
 from comfy.comfy_types import IO
 from .modules.io_helpers import Inputter, Outputter
 
