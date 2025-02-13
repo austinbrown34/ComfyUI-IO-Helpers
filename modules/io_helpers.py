@@ -6,6 +6,7 @@ import numpy as np
 import os
 
 class Outputter:
+    OUTPUT_FORMATS = ["pt", "pth", "npy"]
     @staticmethod
     def save_data(data, filename_prefix, output_format):
         """

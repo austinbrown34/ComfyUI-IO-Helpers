@@ -24,7 +24,7 @@ class EncodedPromptToFile:
                 "conditioning": ("CONDITIONING", ),
                 "filename_prefix": ("STRING", ),
                 # output_format can be pt, pth, or npy
-                "output_format": ([("STRING", {"options": ["pt", "pth", "npy"], "default": "pt"})]),
+                "output_format": (Outputter.OUTPUT_FORMATS, {"tooltip": "The format to save the data in."}),
                 "compress": ("BOOLEAN", {"default": True}),
             }
         }
@@ -92,7 +92,7 @@ class SampledLatentsToFile:
                 "latents": ("LATENT", ),
                 "filename_prefix": ("STRING", ),
                 # output_format can be pt, pth, or npy
-                "output_format": ([("STRING", {"options": ["pt", "pth", "npy"], "default": "pt"})]),
+                "output_format": (Outputter.OUTPUT_FORMATS, {"tooltip": "The format to save the data in."}),
                 "compress": ("BOOLEAN", {"default": True}),
             }
         }
