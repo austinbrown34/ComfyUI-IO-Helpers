@@ -5,7 +5,7 @@ import torch
 import gzip
 import numpy as np
 import os
-import safetensors
+import safetensors.torch
 import dill
 
 class Outputter:
@@ -106,9 +106,17 @@ class Inputter:
         if filepath.endswith(".gz"):
             with gzip.open(filepath, "rb") as f:
                 if filepath.endswith(".pt.gz") or filepath.endswith(".pth.gz"):
-                    return torch.load(f)
+                    decompressed_data = f.read()
+                    temp_filepath = filepath[:-3]
+                    with open(temp_filepath, "wb") as temp_f:
+                        temp_f.write(decompressed_data)
+                    try:
+                        return safetensors.torch.load_file(temp_filepath)
+                    finally:
+                        if os.path.exists(temp_filepath):
+                            os.remove(temp_filepath)
                 elif filepath.endswith(".npy.gz"):
-                    return np.load(f)
+                    return np.load(f, allow_pickle=True)
                 elif filepath.endswith(".pkl.gz"):
                     data = dill.load(f)
                     return Inputter.deserialize_custom(data)
@@ -116,9 +124,9 @@ class Inputter:
                     raise ValueError("Invalid file format")
         else:
             if filepath.endswith(".pt") or filepath.endswith(".pth"):
-                return torch.load(filepath)
+                return safetensors.torch.load_file(filepath)
             elif filepath.endswith(".npy"):
-                return np.load(filepath)
+                return np.load(filepath, allow_pickle=True)
             elif filepath.endswith(".pkl"):
                 with open(filepath, "rb") as f:
                     data = dill.load(f)
