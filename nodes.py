@@ -13,8 +13,6 @@ from comfy.comfy_types import IO
 from .modules.io_helpers import Inputter, Outputter
 
 
-EXPORTED_DATA_FILEPATH = "EXPORTED_DATA_FILEPATH"
-
 class EncodedPromptToFile:
     def __init__(self):
         self.output_dir = folder_paths.get_output_directory()
@@ -33,8 +31,8 @@ class EncodedPromptToFile:
             },
         }
     
-    RETURN_TYPES = (IO.STRING, EXPORTED_DATA_FILEPATH,)
-    RETURN_NAMES = ("filepath", "filepath",)
+    RETURN_TYPES = (IO.STRING,)
+    RETURN_NAMES = ("filepath",)
     FUNCTION = "output_encoded_prompt_to_file"
     OUTPUT_NODE = True
     CATEGORY = "export"
@@ -74,11 +72,12 @@ class EncodedPromptFromFile:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "filepath": ((IO.STRING, {"tooltip": "The path to the file to load the data from."}), (EXPORTED_DATA_FILEPATH, {"tooltip": "The path to the file to load the data from.", "forceInput": True}))
+                "filepath": (IO.STRING, {"tooltip": "The path to the file to load the data from."})
             }
         }
     
     RETURN_TYPES = (IO.CONDITIONING, )
+    RETURN_NAMES = ("conditioning", )
     OUTPUT_TOOLTIPS = ("The conditioning tensor loaded from the file.", )
     FUNCTION = "load_encoded_prompt_from_file"
     CATEGORY = "import"
@@ -111,8 +110,8 @@ class SampledLatentsToFile:
             },
         }
     
-    RETURN_TYPES = (IO.STRING, EXPORTED_DATA_FILEPATH,)
-    RETURN_NAMES = ("filepath", "filepath",)
+    RETURN_TYPES = (IO.STRING,)
+    RETURN_NAMES = ("filepath", )
     FUNCTION = "output_sampled_latents_to_file"
     OUTPUT_NODE = True
     CATEGORY = "export"
@@ -152,11 +151,12 @@ class SampledLatentsFromFile:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "filepath": ((IO.STRING, {"tooltip": "The path to the file to load the data from."}), (EXPORTED_DATA_FILEPATH, {"tooltip": "The path to the file to load the data from.", "forceInput": True}))
+                "filepath": (IO.STRING, {"tooltip": "The path to the file to load the data from."})
             }
         }
     
     RETURN_TYPES = (IO.LATENT, )
+    RETURN_NAMES = ("latents", )
     OUTPUT_TOOLTIPS = ("The latents tensor loaded from the file.", )
     FUNCTION = "load_sampled_latents_from_file"
     CATEGORY = "import"
