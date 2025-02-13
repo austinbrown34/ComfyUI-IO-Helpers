@@ -52,7 +52,7 @@ class EncodedPromptToFile:
         }
 
         # Save the data using Outputter
-        file_path = Outputter.save_data(conditioning, filename_prefix, output_format, **kwargs)
+        file_path = Outputter.save_data(conditioning, output_format, **kwargs)
         
         if compress:
             file_path = Outputter.compress_file(file_path)
@@ -121,7 +121,7 @@ class SampledLatentsToFile:
         }
 
         # Save the data using Outputter
-        file_path = Outputter.save_data(latents, filename_prefix, output_format, **kwargs)
+        file_path = Outputter.save_data(latents, output_format, **kwargs)
         
         if compress:
             file_path = Outputter.compress_file(file_path)
