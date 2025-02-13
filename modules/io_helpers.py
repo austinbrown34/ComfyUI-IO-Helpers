@@ -50,7 +50,7 @@ class Outputter:
                     metadata[x] = json.dumps(extra_pnginfo[x])
         
         if dynamic_filename_suffix:
-            file_path_pre = f"{filename}_{counter:05}_"
+            file_path_pre = f"{filename}_{counter:05}"
             file_path = os.path.join(full_output_folder, f"{file_path_pre}.{output_format}")
         else:
             file_path = os.path.join(full_output_folder, f"{filename_prefix}.{output_format}")
@@ -61,18 +61,18 @@ class Outputter:
             else:
                 safetensors.torch.save_file(data, file_path)
         elif output_format == "npy":
-            if metadata is not None:
-                np.save(file_path, data, allow_pickle=True)
-                with open(file_path + ".json", "w") as f:
-                    json.dump(metadata, f)
-            else:
-                np.save(file_path, data, allow_pickle=True)
+            np.save(file_path, data, allow_pickle=True)
         elif output_format == "pkl":
             serialized_data = Outputter.serialize_custom(data)
             with open(file_path, "wb") as f:
                 dill.dump(serialized_data, f)
         else:
             raise ValueError("Invalid output format")
+        
+        if metadata is not None:
+            with open(file_path + ".json", "w") as f:
+                json.dump(metadata, f)
+        
         return file_path
 
     @staticmethod
