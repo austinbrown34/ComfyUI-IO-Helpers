@@ -1,7 +1,7 @@
 [project]
 name = "io-helpers"
 description = "A custom nodes package for ComfyUI that enhances workflow flexibility by providing specialized nodes for saving and loading intermediate data (encoded prompts and sampled latents) in multiple formats. This package leverages helper classes for file I/O, supports gzip compression for efficient storage, and integrates progress feedback via a progress bar to improve user experience during long operations."
-version = "1.0.1"
+version = "1.0.2"
 readme = "README.md"
 authors = [
     { name = "Austin Brown", email = "austinbrown34@gmail.com" }
