@@ -5,6 +5,7 @@ import torch
 import gzip
 import numpy as np
 import os
+import safetensors
 
 class Outputter:
     OUTPUT_FORMATS = ["pt", "pth", "npy"]
@@ -37,9 +38,9 @@ class Outputter:
 
         if output_format in ["pt", "pth"]:
             if metadata is not None:
-                torch.save_file(data, file_path, metadata=metadata)
+                safetensors.torch.save_file(data, file_path, metadata=metadata)
             else:
-                torch.save_file(data, file_path)
+                safetensors.torch.save_file(data, file_path)
         elif output_format == "npy":
             np.save(file_path, data)
         else:
