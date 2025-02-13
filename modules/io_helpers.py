@@ -6,9 +6,23 @@ import gzip
 import numpy as np
 import os
 import safetensors
+import dill
 
 class Outputter:
-    OUTPUT_FORMATS = ["pt", "pth", "npy"]
+    LATENT_OUTPUT_FORMATS = ["pt", "pth", "npy"]
+    CONDITIONING_OUTPUT_FORMATS = ["pkl"]
+    
+    @staticmethod
+    def serialize_custom(obj):
+        if isinstance(obj, torch.Tensor):
+            return {"__type__": "tensor", "data": obj.tolist()}
+        elif isinstance(obj, list):
+            return [Outputter.serialize_custom(item) for item in obj]
+        elif isinstance(obj, dict):
+            return {key: Outputter.serialize_custom(value) for key, value in obj.items()}
+        else:
+            return obj
+    
     @staticmethod
     def save_data(data, output_format, file_info):
         """
@@ -42,7 +56,16 @@ class Outputter:
             else:
                 safetensors.torch.save_file(data, file_path)
         elif output_format == "npy":
-            np.save(file_path, data)
+            if metadata is not None:
+                np.save(file_path, data, allow_pickle=True)
+                with open(file_path + ".json", "w") as f:
+                    json.dump(metadata, f)
+            else:
+                np.save(file_path, data, allow_pickle=True)
+        elif output_format == "pkl":
+            serialized_data = Outputter.serialize_custom(data)
+            with open(file_path, "wb") as f:
+                dill.dump(serialized_data, f)
         else:
             raise ValueError("Invalid output format")
         return file_path
@@ -63,6 +86,18 @@ class Outputter:
 
 class Inputter:
     @staticmethod
+    def deserialize_custom(obj):
+        if isinstance(obj, dict):
+            if "__type__" in obj:
+                if obj["__type__"] == "tensor":
+                    return torch.tensor(obj["data"])
+            return {key: Inputter.deserialize_custom(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [Inputter.deserialize_custom(item) for item in obj]
+        else:
+            return obj
+    
+    @staticmethod
     def load_data(filepath):
         """
         Load data (a tensor or array) from the given file.
@@ -74,6 +109,9 @@ class Inputter:
                     return torch.load(f)
                 elif filepath.endswith(".npy.gz"):
                     return np.load(f)
+                elif filepath.endswith(".pkl.gz"):
+                    data = dill.load(f)
+                    return Inputter.deserialize_custom(data)
                 else:
                     raise ValueError("Invalid file format")
         else:
@@ -81,5 +119,9 @@ class Inputter:
                 return torch.load(filepath)
             elif filepath.endswith(".npy"):
                 return np.load(filepath)
+            elif filepath.endswith(".pkl"):
+                with open(filepath, "rb") as f:
+                    data = dill.load(f)
+                    return Inputter.deserialize_custom(data)
             else:
                 raise ValueError("Invalid file format")
