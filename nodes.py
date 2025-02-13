@@ -165,34 +165,6 @@ class EncodedPromptToFile:
         return (file_path,)
 
 
-class EncodedPromptFromFile:
-    def __init__(self):
-        self.output_dir = folder_paths.get_output_directory()
-    
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "filepath": (IO.STRING, {"tooltip": "The path to the file to load the data from."}),
-                "use_absolute_path": (IO.BOOLEAN, {"default": False, "tooltip": "If True, uses the absolute path to the file."})
-            }
-        }
-    
-    RETURN_TYPES = (IO.CONDITIONING, )
-    RETURN_NAMES = ("conditioning", )
-    OUTPUT_TOOLTIPS = ("The conditioning tensor loaded from the file.", )
-    FUNCTION = "load_encoded_prompt_from_file"
-    CATEGORY = "import"
-    DESCRIPTION = "Load the encoded prompt from a file."
-
-    def load_encoded_prompt_from_file(self, filepath, use_absolute_path=False):
-        if not use_absolute_path:
-            full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filepath, self.output_dir)
-            filepath = os.path.join(full_output_folder, filename)
-        data = Inputter.load_data(filepath)
-        return (data,)
-
-
 class SampledLatentsToFile:
     def __init__(self):
         self.output_dir = folder_paths.get_output_directory()
@@ -202,7 +174,7 @@ class SampledLatentsToFile:
         return {
             "required": {
                 "latents": (IO.LATENT, {"tooltip": "The latents tensor to save."}),
-                "filename_prefix": (IO.STRING, {"default": "IO-Helpers/conditionings/sampled", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or other values from nodes."}),
+                "filename_prefix": (IO.STRING, {"default": "IO-Helpers/latents/sampled", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or other values from nodes."}),
                 "output_format": (Outputter.LATENT_OUTPUT_FORMATS, {"default": "pt", "tooltip": "The format to save the data in."}),
                 "compress": (IO.BOOLEAN, {"default": True, "tooltip": "If True, compresses the file with gzip."}),
                 "dynamic_filename_suffix": (IO.BOOLEAN, {"default": True, "tooltip": "If True, appends a dynamic suffix to the filename."})
@@ -243,6 +215,46 @@ class SampledLatentsToFile:
         return (file_path,)
 
 
+class EncodedPromptFromFile:
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+    
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "selected_file": ("STRING", {"default": "", "tooltip": "The selected file path"}),
+            },
+            "optional": {
+                "use_absolute_path": ("BOOLEAN", {"default": False, "tooltip": "If True, uses the absolute path to the file."})
+            }
+        }
+    
+    RETURN_TYPES = (IO.CONDITIONING, )
+    RETURN_NAMES = ("conditioning", )
+    OUTPUT_TOOLTIPS = ("The conditioning tensor loaded from the file.", )
+    FUNCTION = "load_encoded_prompt_from_file"
+    CATEGORY = "import"
+    DESCRIPTION = "Load the encoded prompt from a file using file browser."
+
+    def load_encoded_prompt_from_file(self, selected_file="", use_absolute_path=False):
+        if selected_file:
+            filepath = selected_file if use_absolute_path else selected_file
+            data = Inputter.load_data(filepath)
+            return (data,)
+        return (None,)
+        
+    @classmethod
+    def IS_CHANGED(cls, selected_file="", use_absolute_path=False):
+        return selected_file
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, selected_file="", use_absolute_path=False):
+        if selected_file and not os.path.isfile(selected_file):
+            return "Selected file does not exist"
+        return True
+
+
 class SampledLatentsFromFile:
     def __init__(self):
         self.output_dir = folder_paths.get_output_directory()
@@ -251,8 +263,10 @@ class SampledLatentsFromFile:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "filepath": (IO.STRING, {"tooltip": "The path to the file to load the data from."}),
-                "use_absolute_path": (IO.BOOLEAN, {"default": False, "tooltip": "If True, uses the absolute path to the file."})
+                "selected_file": ("STRING", {"default": "", "tooltip": "The selected file path"}),
+            },
+            "optional": {
+                "use_absolute_path": ("BOOLEAN", {"default": False, "tooltip": "If True, uses the absolute path to the file."})
             }
         }
     
@@ -261,11 +275,21 @@ class SampledLatentsFromFile:
     OUTPUT_TOOLTIPS = ("The latents tensor loaded from the file.", )
     FUNCTION = "load_sampled_latents_from_file"
     CATEGORY = "import"
-    DESCRIPTION = "Load the sampled latents from a file."
+    DESCRIPTION = "Load the sampled latents from a file using file browser."
 
-    def load_sampled_latents_from_file(self, filepath, use_absolute_path=False):
-        if not use_absolute_path:
-            full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filepath, self.output_dir)
-            filepath = os.path.join(full_output_folder, filename)
-        data = Inputter.load_data(filepath)
-        return (data,)
+    def load_sampled_latents_from_file(self, selected_file="", use_absolute_path=False):
+        if selected_file:
+            filepath = selected_file if use_absolute_path else selected_file
+            data = Inputter.load_data(filepath)
+            return (data,)
+        return (None,)
+        
+    @classmethod
+    def IS_CHANGED(cls, selected_file="", use_absolute_path=False):
+        return selected_file
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, selected_file="", use_absolute_path=False):
+        if selected_file and not os.path.isfile(selected_file):
+            return "Selected file does not exist"
+        return True
