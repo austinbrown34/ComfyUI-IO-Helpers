@@ -22,7 +22,7 @@ class EncodedPromptToFile:
             "required": {
                 "conditioning": (IO.CONDITIONING, {"tooltip": "The conditioning tensor to save."}),
                 "filename_prefix": (IO.STRING, {"default": "IO-Helpers", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or other values from nodes."}),
-                "output_format": (Outputter.OUTPUT_FORMATS, {"default": "pt", "tooltip": "The format to save the data in."}),
+                "output_format": (Outputter.CONDITIONING_OUTPUT_FORMATS, {"default": "pt", "tooltip": "The format to save the data in."}),
                 "compress": (IO.BOOLEAN, {"default": True, "tooltip": "If True, compresses the file with gzip."})
             },
             "hidden": {
@@ -91,7 +91,7 @@ class SampledLatentsToFile:
             "required": {
                 "latents": (IO.LATENT, {"tooltip": "The latents tensor to save."}),
                 "filename_prefix": (IO.STRING, {"default": "IO-Helpers", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or other values from nodes."}),
-                "output_format": (Outputter.OUTPUT_FORMATS, {"default": "pt", "tooltip": "The format to save the data in."}),
+                "output_format": (Outputter.LATENT_OUTPUT_FORMATS, {"default": "pt", "tooltip": "The format to save the data in."}),
                 "compress": (IO.BOOLEAN, {"default": True, "tooltip": "If True, compresses the file with gzip."})
             },
             "hidden": {
