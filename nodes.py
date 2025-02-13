@@ -78,7 +78,7 @@ class EncodedPromptFromFile:
 
     def load_encoded_prompt_from_file(self, filepath):
         data = Inputter.load_data(filepath)
-        return data
+        return (data,)
 
 
 class SampledLatentsToFile:
@@ -147,4 +147,4 @@ class SampledLatentsFromFile:
 
     def load_sampled_latents_from_file(self, filepath):
         data = Inputter.load_data(filepath)
-        return data
+        return (data,)
