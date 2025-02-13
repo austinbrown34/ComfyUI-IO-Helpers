@@ -1,5 +1,6 @@
 # modules/io_helpers.py
 
+import json
 import torch
 import gzip
 import numpy as np
@@ -8,18 +9,39 @@ import os
 class Outputter:
     OUTPUT_FORMATS = ["pt", "pth", "npy"]
     @staticmethod
-    def save_data(data, filename_prefix, output_format):
+    def save_data(data, filename_prefix, output_format, **kwargs):
         """
         Save data (a tensor or array) to disk using the specified format.
         Returns the file path of the saved file.
         """
+        prompt = kwargs.get("prompt")
+        extra_pnginfo = kwargs.get("extra_pnginfo")
+        disable_metadata = kwargs.get("disable_metadata")
+        full_output_folder = kwargs.get("full_output_folder")
+        filename = kwargs.get("filename")
+        counter = kwargs.get("counter")
+        
+        prompt_info = ""
+        if prompt is not None:
+            prompt_info = json.dumps(prompt)
+
+        metadata = None
+        if not disable_metadata:
+            metadata = {"prompt": prompt_info}
+            if extra_pnginfo is not None:
+                for x in extra_pnginfo:
+                    metadata[x] = json.dumps(extra_pnginfo[x])
+                    
+        file_path_pre = f"{filename}_{counter:05}_"
+        file_path = os.path.join(full_output_folder, f"{file_path_pre}.{output_format}")
+
         if output_format in ["pt", "pth"]:
-            file_path = f"{filename_prefix}.{output_format}"
-            torch.save(data, file_path)
+            if metadata is not None:
+                torch.save_file(data, file_path, metadata=metadata)
+            else:
+                torch.save_file(data, file_path)
         elif output_format == "npy":
-            # np.save automatically appends the .npy extension if not provided
-            file_path = f"{filename_prefix}.npy"
-            np.save(filename_prefix, data)
+            np.save(file_path, data)
         else:
             raise ValueError("Invalid output format")
         return file_path

@@ -6,7 +6,6 @@ data for the prompt encoding and sampling stages. It uses the Inputter and Outpu
 helper classes (from modules/io_helpers.py) and updates progress via a ProgressBar.
 """
 
-from comfy.utils import ProgressBar
 from comfy.cli_args import args
 import folder_paths
 from comfy.comfy_types import IO
@@ -40,8 +39,6 @@ class EncodedPromptToFile:
 
     def output_encoded_prompt_to_file(self, conditioning, filename_prefix, output_format="pt", compress=True, prompt=None, extra_pnginfo=None):
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
-        pb = ProgressBar()
-        pb.update(0)
 
         kwargs = {
             "prompt": prompt,
@@ -56,13 +53,9 @@ class EncodedPromptToFile:
 
         # Save the data using Outputter
         file_path = Outputter.save_data(conditioning, filename_prefix, output_format, **kwargs)
-        pb.update(50)
         
         if compress:
             file_path = Outputter.compress_file(file_path)
-            pb.update(100)
-        else:
-            pb.update(100)
             
         return (file_path,)
 
@@ -84,11 +77,7 @@ class EncodedPromptFromFile:
     DESCRIPTION = "Load the encoded prompt from a file."
 
     def load_encoded_prompt_from_file(self, filepath):
-        pb = ProgressBar()
-        pb.update(0)
-        
         data = Inputter.load_data(filepath)
-        pb.update(100)
         return data
 
 
@@ -119,8 +108,6 @@ class SampledLatentsToFile:
 
     def output_sampled_latents_to_file(self, latents, filename_prefix, output_format="pt", compress=True, prompt=None, extra_pnginfo=None):
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
-        pb = ProgressBar()
-        pb.update(0)
 
         kwargs = {
             "prompt": prompt,
@@ -135,13 +122,9 @@ class SampledLatentsToFile:
 
         # Save the data using Outputter
         file_path = Outputter.save_data(latents, filename_prefix, output_format, **kwargs)
-        pb.update(50)
         
         if compress:
             file_path = Outputter.compress_file(file_path)
-            pb.update(100)
-        else:
-            pb.update(100)
             
         return (file_path,)
 
@@ -163,9 +146,5 @@ class SampledLatentsFromFile:
     DESCRIPTION = "Load the sampled latents from a file."
 
     def load_sampled_latents_from_file(self, filepath):
-        pb = ProgressBar()
-        pb.update(0)
-        
         data = Inputter.load_data(filepath)
-        pb.update(100)
         return data
