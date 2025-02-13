@@ -9,17 +9,17 @@ import os
 class Outputter:
     OUTPUT_FORMATS = ["pt", "pth", "npy"]
     @staticmethod
-    def save_data(data, filename_prefix, output_format, **kwargs):
+    def save_data(data, output_format, file_info):
         """
         Save data (a tensor or array) to disk using the specified format.
         Returns the file path of the saved file.
         """
-        prompt = kwargs.get("prompt")
-        extra_pnginfo = kwargs.get("extra_pnginfo")
-        disable_metadata = kwargs.get("disable_metadata")
-        full_output_folder = kwargs.get("full_output_folder")
-        filename = kwargs.get("filename")
-        counter = kwargs.get("counter")
+        prompt = file_info.get("prompt")
+        extra_pnginfo = file_info.get("extra_pnginfo")
+        disable_metadata = file_info.get("disable_metadata")
+        full_output_folder = file_info.get("full_output_folder")
+        filename = file_info.get("filename")
+        counter = file_info.get("counter")
         
         prompt_info = ""
         if prompt is not None:
