@@ -1,11 +1,7 @@
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "comfyui-io-helpers"
-version = "0.1.1"
+name = "io-helpers"
 description = "A custom nodes package for ComfyUI that enhances workflow flexibility by providing specialized nodes for saving and loading intermediate data (encoded prompts and sampled latents) in multiple formats. This package leverages helper classes for file I/O, supports gzip compression for efficient storage, and integrates progress feedback via a progress bar to improve user experience during long operations."
+version = "1.0.0"
 readme = "README.md"
 authors = [
     { name = "Austin Brown", email = "austinbrown34@gmail.com" }
@@ -30,7 +26,11 @@ dependencies = [
     "numpy>=1.19"
 ]
 
+[project.urls]
+Repository = "https://github.com/austinbrown34/ComfyUI-IO-Helpers"
+#  Used by Comfy Registry https://comfyregistry.org
+
 [tool.comfy]
 PublisherId = "austinbrown34"
 DisplayName = "ComfyUI-IO-Helpers"
-Icon = ""
+Icon = "https://comfyui-io-helpers.s3.us-east-1.amazonaws.com/comfyui-io-helpers-scaled-banner.png"

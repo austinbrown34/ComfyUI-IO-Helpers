@@ -1,0 +1,146 @@
+{
+    "3": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+            "clip": [
+                "4",
+                0
+            ],
+            "text": "a beautiful mountain landscape with snow peaks"
+        }
+    },
+    "4": {
+        "class_type": "CLIPLoader",
+        "inputs": {
+            "clip_name": "stabilityai/stable-diffusion-2-1"
+        }
+    },
+    "5": {
+        "class_type": "EmptyLatentImage",
+        "inputs": {
+            "batch_size": 1,
+            "height": 512,
+            "width": 512
+        }
+    },
+    "6": {
+        "class_type": "KSampler",
+        "inputs": {
+            "cfg": 7,
+            "denoise": 1,
+            "latent_image": [
+                "5",
+                0
+            ],
+            "model": [
+                "7",
+                0
+            ],
+            "negative": [
+                "8",
+                0
+            ],
+            "positive": [
+                "3",
+                0
+            ],
+            "sampler_name": "euler",
+            "scheduler": "normal",
+            "seed": 8566257,
+            "steps": 20
+        }
+    },
+    "7": {
+        "class_type": "CheckpointLoaderSimple",
+        "inputs": {
+            "ckpt_name": "v1-5-pruned.ckpt"
+        }
+    },
+    "8": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+            "clip": [
+                "4",
+                0
+            ],
+            "text": "ugly, blurry, distorted"
+        }
+    },
+    "9": {
+        "class_type": "Encoded Prompt to File",
+        "inputs": {
+            "conditioning": [
+                "3",
+                0
+            ],
+            "filename_prefix": "mountain_landscape_positive",
+            "output_format": "pt",
+            "compress": true
+        }
+    },
+    "10": {
+        "class_type": "Encoded Prompt to File",
+        "inputs": {
+            "conditioning": [
+                "8",
+                0
+            ],
+            "filename_prefix": "mountain_landscape_negative",
+            "output_format": "pt",
+            "compress": true
+        }
+    },
+    "11": {
+        "class_type": "Sampled Latents to File",
+        "inputs": {
+            "latents": [
+                "6",
+                0
+            ],
+            "filename_prefix": "mountain_landscape_latents",
+            "output_format": "pt",
+            "compress": true
+        }
+    },
+    "12": {
+        "class_type": "Encoded Prompt from File",
+        "inputs": {
+            "filepath": "mountain_landscape_positive.pt.gz"
+        }
+    },
+    "13": {
+        "class_type": "Encoded Prompt from File",
+        "inputs": {
+            "filepath": "mountain_landscape_negative.pt.gz"
+        }
+    },
+    "14": {
+        "class_type": "Sampled Latents from File",
+        "inputs": {
+            "filepath": "mountain_landscape_latents.pt.gz"
+        }
+    },
+    "15": {
+        "class_type": "VAEDecode",
+        "inputs": {
+            "samples": [
+                "14",
+                0
+            ],
+            "vae": [
+                "7",
+                2
+            ]
+        }
+    },
+    "16": {
+        "class_type": "SaveImage",
+        "inputs": {
+            "filename_prefix": "mountain_landscape_output",
+            "images": [
+                "15",
+                0
+            ]
+        }
+    }
+}
