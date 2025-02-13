@@ -40,7 +40,7 @@ class EncodedPromptToFile:
     def output_encoded_prompt_to_file(self, conditioning, filename_prefix, output_format="pt", compress=True, prompt=None, extra_pnginfo=None):
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
 
-        kwargs = {
+        file_info = {
             "prompt": prompt,
             "extra_pnginfo": extra_pnginfo,
             "disable_metadata": args.disable_metadata,
@@ -52,7 +52,7 @@ class EncodedPromptToFile:
         }
 
         # Save the data using Outputter
-        file_path = Outputter.save_data(conditioning, output_format, **kwargs)
+        file_path = Outputter.save_data(conditioning, output_format, file_info)
         
         if compress:
             file_path = Outputter.compress_file(file_path)
@@ -109,7 +109,7 @@ class SampledLatentsToFile:
     def output_sampled_latents_to_file(self, latents, filename_prefix, output_format="pt", compress=True, prompt=None, extra_pnginfo=None):
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
 
-        kwargs = {
+        file_info = {
             "prompt": prompt,
             "extra_pnginfo": extra_pnginfo,
             "disable_metadata": args.disable_metadata,
@@ -121,7 +121,7 @@ class SampledLatentsToFile:
         }
 
         # Save the data using Outputter
-        file_path = Outputter.save_data(latents, output_format, **kwargs)
+        file_path = Outputter.save_data(latents, output_format, file_info)
         
         if compress:
             file_path = Outputter.compress_file(file_path)
