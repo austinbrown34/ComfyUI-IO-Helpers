@@ -35,6 +35,8 @@ class Outputter:
         full_output_folder = file_info.get("full_output_folder")
         filename = file_info.get("filename")
         counter = file_info.get("counter")
+        filename_prefix = file_info.get("filename_prefix")
+        dynamic_filename_suffix = file_info.get("dynamic_filename_suffix")
         
         prompt_info = ""
         if prompt is not None:
@@ -46,9 +48,12 @@ class Outputter:
             if extra_pnginfo is not None:
                 for x in extra_pnginfo:
                     metadata[x] = json.dumps(extra_pnginfo[x])
-                    
-        file_path_pre = f"{filename}_{counter:05}_"
-        file_path = os.path.join(full_output_folder, f"{file_path_pre}.{output_format}")
+        
+        if dynamic_filename_suffix:
+            file_path_pre = f"{filename}_{counter:05}_"
+            file_path = os.path.join(full_output_folder, f"{file_path_pre}.{output_format}")
+        else:
+            file_path = os.path.join(full_output_folder, f"{filename_prefix}.{output_format}")
 
         if output_format in ["pt", "pth"]:
             if metadata is not None:
